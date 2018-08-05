@@ -28,16 +28,17 @@ func RunPlaybook(man *model.Playbook, vars model.Vars) (map[string]*model.Assert
 			return nil, errors.Wrapf(err, "failed to create http request for stage [%s]", st)
 		}
 
+		resp := st.Response
+
 		// (1) do request
 		//
 		httpResp, err := c.Do(httpReq)
 		if err != nil {
 			// stage failed hardly!
-			a.AddOf(model.StatusAssertion, "", "503", "hard network failure")
+			a.AddOf(model.StatusAssertion, resp.Code, "503", "hard network failure")
 			continue
 		}
 
-		resp := st.Response
 		// (2) assert status code
 		//
 		a.AddOf(model.StatusAssertion, resp.Code, httpResp.StatusCode, httpResp.Status)
