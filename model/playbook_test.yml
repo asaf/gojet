@@ -17,7 +17,8 @@ stages:
     url: https://server/posts
     method: POST
     json:
-
+      title: "hello"
+      body: "world"
     headers:
       content-type: application/json
   response:

@@ -7,7 +7,7 @@ import (
 	"github.com/ghodss/yaml"
 )
 
-func TestPlaybook_Marshal(t *testing.T) {
+func TestPlaybook_Unmarshal(t *testing.T) {
 	f, err := ioutil.ReadFile("./playbook_test.yml")
 	assert.Nil(t, err)
 	var pb *Playbook
@@ -17,14 +17,14 @@ func TestPlaybook_Marshal(t *testing.T) {
 	//
 	assert.Equal(t, "Sample Playbook", pb.Name)
 	assert.Len(t, pb.Stages, 2)
-	s1 := pb.Stages[0]
-	assert.Equal(t, "s1", s1.Name)
-	s2 := pb.Stages[1]
-	assert.Equal(t, "s2", s2.Name)
 
 	// stage level assertions
 	//
-	assert.Equal(t, "s1", s1.Name)
+	// stage 1
+	//
+	//
+	s1 := pb.Stages[0]
+	assert.Equal(t, "s1", s1.Name, "stages order should be preserved")
 
 	// request level assertions
 	//
@@ -42,4 +42,15 @@ func TestPlaybook_Marshal(t *testing.T) {
 	body := resp.Body
 	assert.Len(t, body, 1)
 	assert.Equal(t, float64(1), body["id"])
+
+	// stage 2
+	//
+	//
+	s2 := pb.Stages[1]
+	assert.Equal(t, "s2", s2.Name, "stages order should be preserved")
+	req = s2.Request
+	assert.Equal(t, "https://server/posts", req.Url)
+	assert.Equal(t, POST, req.Method)
+	assert.Len(t, req.Headers, 1)
+	assert.Equal(t, "application/json", req.Headers["content-type"])
 }
