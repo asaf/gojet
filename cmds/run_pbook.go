@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"bytes"
 	log "github.com/sirupsen/logrus"
+	"github.com/asaf/gojet/scripting"
 )
 
 //RunPlaybook runs a playbook and yields an Assertions per stage
@@ -20,6 +21,11 @@ func RunPlaybook(man *model.Playbook, vars model.Vars) (map[string]*model.Assert
 
 	as := map[string]*model.Assertions{}
 	for _, st := range man.Stages {
+		vm, err := scripting.NewAnkoVM()
+		if err != nil {
+			return nil, err
+		}
+
 		a := model.NewAssertions()
 		as[st.Name] = a
 
@@ -41,14 +47,18 @@ func RunPlaybook(man *model.Playbook, vars model.Vars) (map[string]*model.Assert
 
 		// (2) assert status code
 		//
-		a.AddOf(model.StatusAssertion, resp.Code, httpResp.StatusCode, httpResp.Status)
+		a.AddOf(model.StatusAssertion, int(resp.Code), httpResp.StatusCode, httpResp.Status)
 
 		// (3) body (json) assertions
 		//
-		var jsonBody interface{}
+		var jsonBody map[string]interface{}
 		err = json.NewDecoder(httpResp.Body).Decode(&jsonBody)
 		if err != nil {
 			a.AddOf(model.BodyAssertion, "json body", "non json body", err.Error())
+		}
+
+		for k, v := range jsonBody {
+			vm.Define(k, v)
 		}
 
 		// handle each body assertion
@@ -61,10 +71,29 @@ func RunPlaybook(man *model.Playbook, vars model.Vars) (map[string]*model.Assert
 			// todo: handle better
 			actual, err := jsonpath.JsonPathLookup(jsonBody, path)
 			if err != nil {
-				fmt.Println("path error: ", err)
-				a.AddOf(model.BodyAssertion, exp, actual, fmt.Sprintf("%v", actual))
+				log.WithFields(log.Fields{"cause": err, "stage": st.Name, "path": path}).Error("error in path")
 			} else {
-				a.AddOf(model.BodyAssertion, exp, actual, fmt.Sprintf("%v", actual))
+				var expVal interface{}
+				switch v := exp.(type) {
+				case int:
+					// todo: this is for the time being until yaml gets upgraded to latest ver that returns float64 instead of int
+					expVal = float64(v)
+				case scripting.Exp:
+					vm.Define("val", actual)
+					expRes, err := scripting.Eval(vm, v)
+					if err != nil {
+						// handle!
+						// todo im prove error handling
+						return nil, err
+					}
+					log.WithFields(log.Fields{"exp": exp, "value": expRes}).Debug("evaluated expected value expression")
+					expVal = expRes
+					actual = true
+				default:
+					expVal = exp
+				}
+
+				a.AddOf(model.BodyAssertion, expVal, actual, fmt.Sprintf("%v", actual))
 			}
 		}
 	}
@@ -90,6 +119,6 @@ func buildHttpReqForStage(stage *model.Stage) (*http.Request, error) {
 
 	httpReq.Header = h
 
-	log.WithFields(log.Fields{"stage": stage.Name, "req": httpReq}).Debug("http request created")
+	log.WithFields(log.Fields{"stage": stage.Name, "req-method": httpReq.Method, "req-header": httpReq.Header, "req-body": httpReq.Body}).Debug("http request created")
 	return httpReq, err
 }

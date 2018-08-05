@@ -6,11 +6,11 @@ import (
 	"os"
 	"io/ioutil"
 	"github.com/pkg/errors"
-	"github.com/ghodss/yaml"
 	"github.com/asaf/gojet/model"
-	"github.com/asaf/gojet/cmds"
 	"bytes"
 	"text/template"
+	"github.com/asaf/gojet/yaml"
+	"github.com/asaf/gojet/cmds"
 )
 
 var playbookRunCmd = cli.Command{

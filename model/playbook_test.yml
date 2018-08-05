@@ -24,4 +24,4 @@ stages:
   response:
     code: 200
     body:
-      id: 1
+      total: !exp total > 0

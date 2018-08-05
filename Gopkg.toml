@@ -30,10 +30,6 @@
   unused-packages = true
 
 [[constraint]]
-  name = "github.com/ghodss/yaml"
-  version = "1.0.0"
-
-[[constraint]]
   name = "github.com/urfave/cli"
   version = "1.20.0"
 
@@ -48,3 +44,11 @@
 [[constraint]]
   name = "github.com/sirupsen/logrus"
   version = "1.0.6"
+
+[[constraint]]
+  name = "github.com/mattn/anko"
+  version = "0.0.6"
+
+[[constraint]]
+  branch = "v2"
+  name = "github.com/sanathkr/go-yaml"

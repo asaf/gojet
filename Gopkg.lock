@@ -20,6 +20,17 @@
   version = "v1.0.0"
 
 [[projects]]
+  name = "github.com/mattn/anko"
+  packages = [
+    "ast",
+    "internal/corelib",
+    "parser",
+    "vm"
+  ]
+  revision = "cdc3b7317d35b9d24257e5f5079b3bac4d52705a"
+  version = "v0.0.6"
+
+[[projects]]
   name = "github.com/mattn/go-colorable"
   packages = ["."]
   revision = "167de6bfdfba052fa6b2d3664c8f5272e23c9072"
@@ -48,6 +59,12 @@
   packages = ["difflib"]
   revision = "792786c7400a136282c1664665ae0a8db921c6c2"
   version = "v1.0.0"
+
+[[projects]]
+  branch = "v2"
+  name = "github.com/sanathkr/go-yaml"
+  packages = ["."]
+  revision = "ed9d249f429b3f5a69f80a7abef6bfce81fef894"
 
 [[projects]]
   name = "github.com/sirupsen/logrus"
@@ -91,6 +108,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "efc6fecdec9b0b33f401d5583e925deb35834c44bd5cb21da99875ee839b2562"
+  inputs-digest = "3096a1d21120a8d90c08424da46fb116dc762fa4b89954154581bbaee00a231c"
   solver-name = "gps-cdcl"
   solver-version = 1
