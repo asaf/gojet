@@ -21,9 +21,9 @@ type Playbook struct {
 
 // Stage is a test to be executed within a playbook
 type Stage struct {
-	Name     string   `json:"name"`
-	Request  Request  `json:"request"`
-	Response Response `json:"response"`
+	Name     string    `json:"name"`
+	Request  *Request  `json:"request"`
+	Response *Response `json:"response"`
 }
 
 // Request describes an http request to be executed as apart of a stage
