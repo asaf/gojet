@@ -1,0 +1,26 @@
+---
+
+name: Sample Playbook
+stages:
+- name: s1
+  request:
+    url: https://server/posts/1
+    method: GET
+    headers:
+      content-type: application/json
+  response:
+    code: 200
+    body:
+      id: 1
+- name: s2
+  request:
+    url: https://server/posts
+    method: POST
+    json:
+
+    headers:
+      content-type: application/json
+  response:
+    code: 200
+    body:
+      id: 1
