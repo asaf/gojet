@@ -90,6 +90,10 @@ func loadPlaybook(pbookFname string) (*model.Playbook, error) {
 }
 
 func loadVars(varsFname string, withEnvVars bool) (model.Vars, error) {
+	if varsFname == "" {
+		return model.Vars{}, nil
+	}
+
 	f, err := ioutil.ReadFile(varsFname)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to open vars file")
