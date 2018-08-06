@@ -1,11 +1,12 @@
 language: go
 sudo: false
 go:
-- "1.10"
+- '1.10'
 script:
 - make
 before_install:
-- curl -L -s https://github.com/golang/dep/releases/download/v0.5.0/dep-linux-amd64 -o $GOPATH/bin/dep
+- curl -L -s https://github.com/golang/dep/releases/download/v0.5.0/dep-linux-amd64
+  -o $GOPATH/bin/dep
 - chmod +x $GOPATH/bin/dep
 install:
 - dep ensure
@@ -14,9 +15,10 @@ before_deploy:
 deploy:
   provider: releases
   api_key:
-    secure:
+    secure: HuFTe91yWV+byyw+AXnxGLO1NjW8BOx5Lzhl4HuWheM/RcNiKE3zPIaPWsytR2Or/2zeGDVejsO+m5VRZnP0mYmFWC7WMvMu9qvVM3aVoX/0BPJ1Nv95q8G+4HSN+KfKt0PTWvAkBqI68/8lluK9GCJlbzm68IXmSVjCroVJwruSDTtvUfhvLIhlz3vqUKNniE3x8eJLQp3qCuMLBCpejbWzwp7uBrqV8EBcY5rkS3A2llsGLx+hWVqe+5m7puoBOiEY2SXDfpsW3e9uvXFCTCCisqLda+fOpOcl60A7vhDgBo6DomsQ/Kw0tv5/4O1D6ECqxByLLyRHZuRMW4ut5YS9kR2ftq8YlRK8NYCD32f+IG1Fg5xghTpaqtD90nqeKOH+clrJT+OggQAoh9tfNxbLVuaCL8xFErxR8ugFp4/vDhT+LVSUmw87pYRZe3TF3kKrQm9MZ44O9fZ4gAFoH/DHpxZYpnY5xF7eo9A/oukPOVDqMd7O0ykORpJVE1r9zvPQcQbT7usd8hMXKjp8VvdIzG8ojP/GTpdxZryqXJ3E7v/qMuyrJVSVMsME6q+SkxbQsdPCHmfm02qi19HozlYH3yiwR9l5UOCo0R07G4CYXxAcJ67St4ZmXuJfQ2/KRKFk0LsY97wGpzQjXjm7POZpPMScvb7pEinnBxbNfvU=
   file: release/*
   file_glob: true
   skip_cleanup: true
   on:
     tags: true
+    repo: asaf/gojet
