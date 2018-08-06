@@ -1,2 +1,4 @@
 token: foo
-api_url: http://localhost
+host: localhost
+url: "http://{host}"
+api_url: "{url}/api"

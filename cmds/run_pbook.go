@@ -12,10 +12,8 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/asaf/gojet/scripting"
 	"time"
-	"regexp"
+	"github.com/asaf/gojet/placeholders"
 )
-
-var phRegExp = regexp.MustCompile(`\{(.*?)\}`)
 
 //RunPlaybook runs a playbook and yields an Assertions per stage
 // todo: split into more logical components
@@ -158,6 +156,9 @@ func createHttpRequestOfRequest(stage *model.Stage) (*http.Request, error) {
 	}
 
 	httpReq, err := http.NewRequest(string(stage.Request.Method), stage.Request.Url, bytes.NewBuffer(body))
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to create http request")
+	}
 	q := httpReq.URL.Query()
 	for k, v := range req.Query {
 		q.Add(k, v)
@@ -214,7 +215,7 @@ func resolveStagePlaceholders(st *model.Stage, vars model.Vars) error {
 	// resolve url
 	//
 	req := st.Request
-	resolvedUrl, err := resolvePlaceholders(req.Url, vars)
+	resolvedUrl, err := placeholders.Resolve(req.Url, vars)
 	if err != nil {
 		return err
 	}
@@ -223,7 +224,7 @@ func resolveStagePlaceholders(st *model.Stage, vars model.Vars) error {
 	// resolve query params
 	q := req.Query
 	for k, v := range q {
-		val, err := resolvePlaceholders(v, vars)
+		val, err := placeholders.Resolve(v, vars)
 		if err != nil {
 			return fmt.Errorf("cannot resolve query param [%s:%s]", k, v)
 		}
@@ -233,42 +234,13 @@ func resolveStagePlaceholders(st *model.Stage, vars model.Vars) error {
 	// resolve header
 	h := req.Headers
 	for k, v := range h {
-		val, err := resolvePlaceholders(v, vars)
+		val, err := placeholders.Resolve(v, vars)
 		if err != nil {
 			return fmt.Errorf("cannot resolve header [%s:%s]", k, v)
 		}
 		h[k] = fmt.Sprintf("%v", val)
 	}
 	return nil
-}
-
-// resolvePlaceholders resolves placeholders of s by vars
-func resolvePlaceholders(s string, vars model.Vars) (interface{}, error) {
-	matches := phRegExp.FindAllStringSubmatch(s, -1)
-	if matches == nil {
-		// no matches found
-		return s, nil
-	}
-
-	if len(matches) == 1 && strings.HasPrefix(s, "{") && strings.HasSuffix(s, "}") {
-		ph := matches[0][1]
-		// single place holder, can be resolved to any type
-		if val, ok := vars[ph]; ok {
-			return val, nil
-		}
-		return nil, fmt.Errorf("error resolving var [%s]", ph)
-	}
-
-	for _, m := range matches {
-		ph := m[0]
-		val := fmt.Sprintf("%s", m[1])
-		resolvedVal := vars[val]
-		if resolvedVal == nil {
-			return s, fmt.Errorf("var [%s] does not exist", val)
-		}
-		s = strings.Replace(s, ph, fmt.Sprintf("%v", resolvedVal), -1)
-	}
-	return s, nil
 }
 
 func createVMForStage(st *model.Stage, body map[string]interface{}) (scripting.VM, error) {

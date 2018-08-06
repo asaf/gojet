@@ -14,7 +14,11 @@ func TestVars(t *testing.T) {
 	err = yaml.Unmarshal(f, &vars)
 	assert.Nil(t, err)
 
-	assert.Len(t, vars, 2)
+	err = vars.Resolve()
+	assert.Nil(t, err)
+
+	assert.Len(t, vars, 4)
 	assert.Equal(t, "foo", vars["token"])
-	assert.Equal(t, "http://localhost", vars["api_url"])
+	assert.Equal(t, "http://localhost", vars["url"])
+	assert.Equal(t, "http://localhost/api", vars["api_url"])
 }

@@ -52,21 +52,6 @@ func TestCreateHttpRequestOfRequest(t *testing.T) {
 	assert.Equal(t, `{"content":{"type":"markdown"},"id":1,"title":"hello"}`, string(bodyBytes))
 }
 
-func TestResolvePlaceholders(t *testing.T) {
-	vars := model.Vars{"ph1": "foo", "ph2": "bar", "num": 9}
-	res, err := resolvePlaceholders("/{ph1}/{ph2}", vars)
-	assert.Nil(t, err)
-	assert.Equal(t, "/foo/bar", res)
-
-	res, err = resolvePlaceholders("/{num}", vars)
-	assert.Nil(t, err)
-	assert.Equal(t, "/9", res)
-
-	res, err = resolvePlaceholders("{num}", vars)
-	assert.Nil(t, err)
-	assert.Equal(t, 9, res)
-}
-
 func TestResolveStagePlaceholders(t *testing.T) {
 	st := &model.Stage{
 		Request: &model.Request{

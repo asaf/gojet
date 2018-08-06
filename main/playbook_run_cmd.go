@@ -7,7 +7,7 @@ import (
 	"io/ioutil"
 	"github.com/pkg/errors"
 	"github.com/asaf/gojet/model"
-			"github.com/asaf/gojet/yaml"
+	"github.com/asaf/gojet/yaml"
 	"github.com/asaf/gojet/cmds"
 	"github.com/sirupsen/logrus"
 )
@@ -77,7 +77,6 @@ func loadPlaybook(pbookFname string) (*model.Playbook, error) {
 		return nil, errors.Wrap(err, "failed to open playbook")
 	}
 
-
 	var pbook *model.Playbook
 	if err := yaml.Unmarshal(f, &pbook); err != nil {
 		return nil, errors.Wrap(err, "failed to parse playbook")
@@ -95,6 +94,10 @@ func loadVars(varsFname string) (model.Vars, error) {
 	var vars model.Vars
 	if err := yaml.Unmarshal(f, &vars); err != nil {
 		return nil, errors.Wrap(err, "failed to parse vars file")
+	}
+
+	if err := vars.Resolve(); err != nil {
+		return nil, errors.Wrap(err, "failed to resolve vars")
 	}
 
 	return vars, nil
