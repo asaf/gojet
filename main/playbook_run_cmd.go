@@ -67,8 +67,8 @@ func testRun(pbookFname, varsFname string, withEnvVars bool) error {
 	}
 
 	Cyan.Printf("playing %s\n", pbook.Name)
-	for st, as := range assertions {
-		MagentaHi.Printf("stage %s\n", st)
+	for _, as := range assertions {
+		MagentaHi.Printf("stage %s\n", as.Name)
 		printAssertions(as)
 	}
 

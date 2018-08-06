@@ -18,18 +18,18 @@ import (
 //RunPlaybook runs a playbook and yields an Assertions per stage
 // todo: split into more logical components
 // todo: write unit tests using a local http server
-func RunPlaybook(pbook *model.Playbook, vars model.Vars) (map[string]*model.Assertions, error) {
+func RunPlaybook(pbook *model.Playbook, vars model.Vars) ([]*model.Assertions, error) {
 	log.WithFields(log.Fields{"name": pbook.Name}).Debug("playbook execution started")
 	elapsed := time.Now()
 	c := http.DefaultClient
 
-	as := map[string]*model.Assertions{}
+	var as []*model.Assertions
 	for _, st := range pbook.Stages {
 		log.WithFields(log.Fields{"name": st.Name}).Debug("executing stage started")
 		stElapsed := time.Now()
 
-		a := model.NewAssertions()
-		as[st.Name] = a
+		a := model.NewAssertions(st.Name)
+		as = append(as, a)
 
 		if st.Request == nil {
 			return nil, fmt.Errorf("request in stage [%s] is required", st.Name)

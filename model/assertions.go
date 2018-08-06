@@ -17,6 +17,7 @@ const (
 
 // Assertions is a logical aggregation of assertion
 type Assertions struct {
+	Name       string       `json:"name"`
 	Assertions []*Assertion `json:"assertions"`
 }
 
@@ -34,8 +35,10 @@ func (as *Assertions) AddOf(kind assertionKind, expected, actual interface{}, ms
 }
 
 // NewAssertions creates an empty Assertions
-func NewAssertions() *Assertions {
-	return &Assertions{}
+func NewAssertions(name string) *Assertions {
+	return &Assertions{
+		Name: name,
+	}
 }
 
 // Assertion is a result of predicate execution

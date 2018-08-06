@@ -128,7 +128,7 @@ func TestRunPlaybook_Simplest(t *testing.T) {
 	as, err := RunPlaybook(pbook, model.Vars{})
 	assert.Nil(t, err)
 	assert.Len(t, as, 1, "assertions per stage")
-	as1 := as[stName].Assertions
+	as1 := as[0].Assertions
 	assert.NotNil(t, as1)
 	assert.Len(t, as1, 1, "only status should be checked")
 	assert.True(t, as1[0].True())
@@ -161,7 +161,7 @@ func TestRunPlaybook_AssertBody(t *testing.T) {
 	as, err := RunPlaybook(pbook, model.Vars{})
 	assert.Nil(t, err)
 	assert.Len(t, as, 1, "assertions per stage")
-	as1 := as[stName].Assertions
+	as1 := as[0].Assertions
 	assert.NotNil(t, as1)
 	assert.Len(t, as1, 3, "status and 3 body assertions")
 	assert.True(t, as1[0].True())
