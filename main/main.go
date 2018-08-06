@@ -18,6 +18,11 @@ func main() {
 	app.Version = consts.Ver
 	app.Usage = "command line utility"
 	app.Flags = []cli.Flag{
+		cli.StringFlag{
+			Name:   "log",
+			Usage:  "define logging verbosity [debug, info, warn, error, fatal]",
+			Value:  "info",
+		},
 	}
 	app.Commands = []cli.Command{
 		testCmds,

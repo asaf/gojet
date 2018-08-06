@@ -9,12 +9,21 @@ import (
 	"github.com/asaf/gojet/model"
 			"github.com/asaf/gojet/yaml"
 	"github.com/asaf/gojet/cmds"
+	"github.com/sirupsen/logrus"
 )
 
 var playbookRunCmd = cli.Command{
 	Name:  "run",
 	Usage: "run a playbook",
 	Action: func(c *cli.Context) {
+		l, err := logrus.ParseLevel(c.GlobalString("log"))
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "log level [%s] is invalid\n", l)
+			return
+		}
+
+		logrus.SetLevel(l)
+
 		pbookFname := c.String("file")
 		if pbookFname == "" {
 			fmt.Fprintf(os.Stderr, "playbook file is required\n")
