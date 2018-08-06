@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 		"github.com/asaf/gojet/yaml"
 	"github.com/asaf/gojet/scripting"
-)
+	)
 
 func TestPlaybook_Unmarshal(t *testing.T) {
 	f, err := ioutil.ReadFile("./playbook_test.yml")
@@ -34,6 +34,8 @@ func TestPlaybook_Unmarshal(t *testing.T) {
 	assert.Equal(t, GET, req.Method)
 	assert.Len(t, req.Headers, 1)
 	assert.Equal(t, "application/json", req.Headers["content-type"])
+	assert.Len(t, req.Query, 1)
+	assert.Equal(t, "bar", req.Query["foo"])
 
 	// response level assertions
 	//
@@ -54,6 +56,7 @@ func TestPlaybook_Unmarshal(t *testing.T) {
 	assert.Equal(t, POST, req.Method)
 	assert.Len(t, req.Headers, 1)
 	assert.Equal(t, "application/json", req.Headers["content-type"])
+	assert.Len(t, req.Json, 3)
 
 	// response level assertions
 	resp = s2.Response

@@ -29,7 +29,7 @@ func RunPlaybook(man *model.Playbook, vars model.Vars) (map[string]*model.Assert
 		a := model.NewAssertions()
 		as[st.Name] = a
 
-		httpReq, err := buildHttpReqForStage(st)
+		httpReq, err := createHttpRequestOfRequest(st)
 		if err != nil {
 			return nil, errors.Wrapf(err, "failed to create http request for stage [%s]", st)
 		}
@@ -56,6 +56,7 @@ func RunPlaybook(man *model.Playbook, vars model.Vars) (map[string]*model.Assert
 		if err != nil {
 			a.AddOf(model.BodyAssertion, "json body", "non json body", err.Error())
 		}
+		log.WithFields(log.Fields{"resp-body": jsonBody}).Debug("http response received")
 
 		for k, v := range jsonBody {
 			vm.Define(k, v)
@@ -101,8 +102,8 @@ func RunPlaybook(man *model.Playbook, vars model.Vars) (map[string]*model.Assert
 	return as, nil
 }
 
-// buildHttpReqForStage creates an http request for stage
-func buildHttpReqForStage(stage *model.Stage) (*http.Request, error) {
+// createHttpRequestOfRequest creates an http request for stage
+func createHttpRequestOfRequest(stage *model.Stage) (*http.Request, error) {
 	req := stage.Request
 
 	body, err := json.Marshal(req.Json)
@@ -111,6 +112,11 @@ func buildHttpReqForStage(stage *model.Stage) (*http.Request, error) {
 	}
 
 	httpReq, err := http.NewRequest(string(stage.Request.Method), stage.Request.Url, bytes.NewBuffer(body))
+	q := httpReq.URL.Query()
+	for k, v := range req.Query {
+		q.Add(k, v)
+	}
+	httpReq.URL.RawQuery = q.Encode()
 
 	h := http.Header{}
 	for k, v := range req.Headers {
@@ -119,6 +125,6 @@ func buildHttpReqForStage(stage *model.Stage) (*http.Request, error) {
 
 	httpReq.Header = h
 
-	log.WithFields(log.Fields{"stage": stage.Name, "req-method": httpReq.Method, "req-header": httpReq.Header, "req-body": httpReq.Body}).Debug("http request created")
+	log.WithFields(log.Fields{"stage": stage.Name, "req-method": httpReq.Method, "req-header": httpReq.Header, "req-body": httpReq.Body, "req-url": httpReq.URL}).Debug("http request created")
 	return httpReq, err
 }

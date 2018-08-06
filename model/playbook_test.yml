@@ -6,6 +6,8 @@ stages:
   request:
     url: https://server/posts/1
     method: GET
+    query:
+      foo: "bar"
     headers:
       content-type: application/json
   response:
@@ -19,6 +21,8 @@ stages:
     json:
       title: "hello"
       body: "world"
+      foo:
+        bar: "baz"
     headers:
       content-type: application/json
   response:
