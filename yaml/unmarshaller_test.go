@@ -1,18 +1,18 @@
-package model
+package yaml
 
 import (
 	"testing"
-	"io/ioutil"
 	"github.com/stretchr/testify/assert"
-		"github.com/asaf/gojet/yaml"
 	"github.com/asaf/gojet/scripting"
-	)
+	"io/ioutil"
+	"github.com/asaf/gojet/model"
+)
 
-func TestPlaybook_Unmarshal(t *testing.T) {
+func TestUnmarshal(t *testing.T) {
 	f, err := ioutil.ReadFile("./playbook_test.yml")
 	assert.Nil(t, err)
-	var pb *Playbook
-	err = yaml.Unmarshal(f, &pb)
+	var pb *model.Playbook
+	err = Unmarshal(f, &pb)
 	assert.Nil(t, err)
 	// top level assertions
 	//
@@ -31,7 +31,7 @@ func TestPlaybook_Unmarshal(t *testing.T) {
 	//
 	req := s1.Request
 	assert.Equal(t, "https://server/posts/1", req.Url)
-	assert.Equal(t, GET, req.Method)
+	assert.Equal(t, model.GET, req.Method)
 	assert.Len(t, req.Headers, 1)
 	assert.Equal(t, "application/json", req.Headers["content-type"])
 	assert.Len(t, req.Query, 1)
@@ -53,7 +53,7 @@ func TestPlaybook_Unmarshal(t *testing.T) {
 	assert.Equal(t, "s2", s2.Name, "stages order should be preserved")
 	req = s2.Request
 	assert.Equal(t, "https://server/posts", req.Url)
-	assert.Equal(t, POST, req.Method)
+	assert.Equal(t, model.POST, req.Method)
 	assert.Len(t, req.Headers, 1)
 	assert.Equal(t, "application/json", req.Headers["content-type"])
 	assert.Len(t, req.Json, 3)

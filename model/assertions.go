@@ -1,6 +1,9 @@
 package model
 
-import "fmt"
+import (
+	"fmt"
+	"github.com/sirupsen/logrus"
+)
 
 // assertionKind describes all possible assertions
 type assertionKind string
@@ -19,6 +22,7 @@ type Assertions struct {
 
 // AddOf adds a new assertion
 func (as *Assertions) AddOf(kind assertionKind, expected, actual interface{}, msg string) {
+	logrus.WithFields(logrus.Fields{"kind": kind, "expected": expected, "actual": actual}).Debug("assertion added")
 	a := &Assertion{
 		Kind:     kind,
 		Expected: expected,
@@ -45,4 +49,8 @@ type Assertion struct {
 // String formats an Assertion as a string
 func (a *Assertion) String() string {
 	return fmt.Sprintf("Expected [%v] but got [%v]", a.Expected, a.Actual)
+}
+
+func (a *Assertion) True() bool {
+	return a.Expected == a.Actual
 }

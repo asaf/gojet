@@ -7,9 +7,7 @@ import (
 	"io/ioutil"
 	"github.com/pkg/errors"
 	"github.com/asaf/gojet/model"
-	"bytes"
-	"text/template"
-	"github.com/asaf/gojet/yaml"
+			"github.com/asaf/gojet/yaml"
 	"github.com/asaf/gojet/cmds"
 )
 
@@ -45,7 +43,7 @@ func testRun(pbookFname, varsFname string) error {
 		return err
 	}
 
-	pbook, err := loadPlaybook(pbookFname, vars)
+	pbook, err := loadPlaybook(pbookFname)
 	if err != nil {
 		return err
 	}
@@ -64,24 +62,19 @@ func testRun(pbookFname, varsFname string) error {
 	return nil
 }
 
-func loadPlaybook(pbookFname string, vars model.Vars) (*model.Playbook, error) {
+func loadPlaybook(pbookFname string) (*model.Playbook, error) {
 	f, err := ioutil.ReadFile(pbookFname)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to open playbook")
 	}
 
-	tmpl := template.Must(template.New("").Parse(string(f)))
-	var buf bytes.Buffer
-	if err := tmpl.Execute(&buf, vars); err != nil {
-		return nil, errors.Wrap(err, "playbook is invalid")
-	}
 
-	var man *model.Playbook
-	if err := yaml.Unmarshal(buf.Bytes(), &man); err != nil {
+	var pbook *model.Playbook
+	if err := yaml.Unmarshal(f, &pbook); err != nil {
 		return nil, errors.Wrap(err, "failed to parse playbook")
 	}
 
-	return man, nil
+	return pbook, nil
 }
 
 func loadVars(varsFname string) (model.Vars, error) {

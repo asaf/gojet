@@ -39,4 +39,9 @@ type Request struct {
 type Response struct {
 	Code int                    `json:"code"`
 	Body map[string]interface{} `json:"body"`
+	Save *SaveResp              `json:"save"`
+}
+
+type SaveResp struct {
+	Body map[string]string `json:"body"`
 }
