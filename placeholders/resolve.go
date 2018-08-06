@@ -9,7 +9,7 @@ import (
 var PlaceHoldersRegExp = regexp.MustCompile(`\{(.*?)\}`)
 
 // resolvePlaceholders resolves placeholders of s by vars
-func Resolve(s string, vars map[string]interface{}) (interface{}, error) {
+func Resolve(s string, vars map[string]interface{}, extras ...map[string]interface{}) (interface{}, error) {
 	matches := PlaceHoldersRegExp.FindAllStringSubmatch(s, -1)
 	if matches == nil {
 		// no matches found
@@ -18,21 +18,41 @@ func Resolve(s string, vars map[string]interface{}) (interface{}, error) {
 
 	if len(matches) == 1 && strings.HasPrefix(s, "{") && strings.HasSuffix(s, "}") {
 		ph := matches[0][1]
+
 		// single place holder, can be resolved to any type
-		if val, ok := vars[ph]; ok {
-			return val, nil
+		v, err := resolveVar(ph, vars, extras...)
+		if err != nil {
+			return nil, err
 		}
-		return nil, fmt.Errorf("error resolving var [%s]", ph)
+
+		return v, nil
 	}
 
 	for _, m := range matches {
-		ph := m[0]
-		val := fmt.Sprintf("%s", m[1])
-		resolvedVal := vars[val]
-		if resolvedVal == nil {
-			return s, fmt.Errorf("var [%s] does not exist", val)
+		ph := m[1]
+
+		resolvedVal, err := resolveVar(ph, vars, extras...)
+		if err != nil {
+			return nil, err
 		}
-		s = strings.Replace(s, ph, fmt.Sprintf("%v", resolvedVal), -1)
+
+		s = strings.Replace(s, m[0], fmt.Sprintf("%v", resolvedVal), -1)
 	}
 	return s, nil
+}
+
+func resolveVar(ph string, vars map[string]interface{}, extras ...map[string]interface{}) (interface{}, error) {
+	// first try to resolve by vars
+	if v, ok := vars[ph]; ok {
+		return v, nil
+	}
+
+	// then try per extra map
+	for _, extra := range extras {
+		if v, ok := extra[ph]; ok {
+			return v, nil
+		}
+	}
+
+	return nil, fmt.Errorf("placeholder [%s] cannot be resolved", ph)
 }

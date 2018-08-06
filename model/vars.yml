@@ -2,3 +2,4 @@ token: foo
 host: localhost
 url: "http://{host}"
 api_url: "{url}/api"
+p: "{PATH}"

@@ -30,7 +30,7 @@ var playbookRunCmd = cli.Command{
 			return
 		}
 
-		if err := testRun(pbookFname, c.String("vars")); err != nil {
+		if err := testRun(pbookFname, c.String("vars"), c.Bool("env-vars")); err != nil {
 			fmt.Fprintf(os.Stderr, "%s\n", err)
 		}
 	},
@@ -43,11 +43,15 @@ var playbookRunCmd = cli.Command{
 			Name:  "vars",
 			Usage: "file containing vars",
 		},
+		cli.BoolFlag{
+			Name:  "env-vars",
+			Usage: "bind env vars",
+		},
 	},
 }
 
-func testRun(pbookFname, varsFname string) error {
-	vars, err := loadVars(varsFname)
+func testRun(pbookFname, varsFname string, withEnvVars bool) error {
+	vars, err := loadVars(varsFname, withEnvVars)
 	if err != nil {
 		return err
 	}
@@ -85,7 +89,7 @@ func loadPlaybook(pbookFname string) (*model.Playbook, error) {
 	return pbook, nil
 }
 
-func loadVars(varsFname string) (model.Vars, error) {
+func loadVars(varsFname string, withEnvVars bool) (model.Vars, error) {
 	f, err := ioutil.ReadFile(varsFname)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to open vars file")
@@ -96,7 +100,7 @@ func loadVars(varsFname string) (model.Vars, error) {
 		return nil, errors.Wrap(err, "failed to parse vars file")
 	}
 
-	if err := vars.Resolve(); err != nil {
+	if err := vars.Resolve(withEnvVars); err != nil {
 		return nil, errors.Wrap(err, "failed to resolve vars")
 	}
 

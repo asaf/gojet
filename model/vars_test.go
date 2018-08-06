@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/yaml.v2"
-)
+	)
 
 func TestVars(t *testing.T) {
 	f, err := ioutil.ReadFile("./vars.yml")
@@ -14,11 +14,12 @@ func TestVars(t *testing.T) {
 	err = yaml.Unmarshal(f, &vars)
 	assert.Nil(t, err)
 
-	err = vars.Resolve()
+	err = vars.Resolve(true)
 	assert.Nil(t, err)
 
-	assert.Len(t, vars, 4)
+	assert.Len(t, vars, 5)
 	assert.Equal(t, "foo", vars["token"])
 	assert.Equal(t, "http://localhost", vars["url"])
 	assert.Equal(t, "http://localhost/api", vars["api_url"])
+	assert.NotNil(t, vars["p"])
 }
