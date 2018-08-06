@@ -14,12 +14,6 @@
   version = "v1.7.0"
 
 [[projects]]
-  name = "github.com/ghodss/yaml"
-  packages = ["."]
-  revision = "0ca9ea5df5451ffdf184b4428c902747c2c11cd7"
-  version = "v1.0.0"
-
-[[projects]]
   name = "github.com/mattn/anko"
   packages = [
     "ast",
@@ -108,6 +102,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "3096a1d21120a8d90c08424da46fb116dc762fa4b89954154581bbaee00a231c"
+  inputs-digest = "e7ad0ba9d33ab44a17768d5365901a97bcdb809a06d48f72f10e38f57381363c"
   solver-name = "gps-cdcl"
   solver-version = 1
