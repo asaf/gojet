@@ -3,7 +3,7 @@ package yaml
 import (
 	"reflect"
 	"fmt"
-	"github.com/sanathkr/go-yaml"
+	"github.com/asaf/yaml"
 	"github.com/asaf/gojet/scripting"
 )
 

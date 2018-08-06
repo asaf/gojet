@@ -62,7 +62,7 @@ func RunPlaybook(pbook *model.Playbook, vars model.Vars) (map[string]*model.Asse
 		// (2) create http request
 		httpReq, err := createHttpRequestOfRequest(st)
 		if err != nil {
-			return nil, errors.Wrapf(err, "failed to create http request for stage [%s]", st)
+			return nil, errors.Wrapf(err, "failed to create http request for stage [%s]", st.Name)
 		}
 
 		// (3) do request

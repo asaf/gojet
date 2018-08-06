@@ -2,6 +2,12 @@
 
 
 [[projects]]
+  name = "github.com/asaf/yaml"
+  packages = ["."]
+  revision = "158a555906825d7437b70482aeea265ee5e44b1f"
+  version = "v3.0.0"
+
+[[projects]]
   name = "github.com/davecgh/go-spew"
   packages = ["spew"]
   revision = "346938d642f2ec3594ed81d874461961cd0faa76"
@@ -55,12 +61,6 @@
   version = "v1.0.0"
 
 [[projects]]
-  branch = "v2"
-  name = "github.com/sanathkr/go-yaml"
-  packages = ["."]
-  revision = "ed9d249f429b3f5a69f80a7abef6bfce81fef894"
-
-[[projects]]
   name = "github.com/sirupsen/logrus"
   packages = ["."]
   revision = "3e01752db0189b9157070a0e1668a620f9a85da2"
@@ -82,7 +82,7 @@
   branch = "master"
   name = "golang.org/x/crypto"
   packages = ["ssh/terminal"]
-  revision = "56440b844dfe139a8ac053f4ecac0b20b79058f4"
+  revision = "f792edd33d2c59a74c4d81e9b9a536e5301a8b83"
 
 [[projects]]
   branch = "master"
@@ -91,7 +91,7 @@
     "unix",
     "windows"
   ]
-  revision = "0ffbfd41fbef8ffcf9b62b0b0aa3a5873ed7a4fe"
+  revision = "34b17bdb430002e9db9ae7ddc8480b9fa05edc22"
 
 [[projects]]
   name = "gopkg.in/yaml.v2"
@@ -102,6 +102,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "e7ad0ba9d33ab44a17768d5365901a97bcdb809a06d48f72f10e38f57381363c"
+  inputs-digest = "df6c23fd98afc8800e66f7fd16caa5923f56645ba51a0547278b0757afefb14a"
   solver-name = "gps-cdcl"
   solver-version = 1

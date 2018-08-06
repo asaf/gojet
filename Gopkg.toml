@@ -48,7 +48,3 @@
 [[constraint]]
   name = "github.com/mattn/anko"
   version = "0.0.6"
-
-[[constraint]]
-  branch = "v2"
-  name = "github.com/sanathkr/go-yaml"
