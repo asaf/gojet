@@ -32,7 +32,7 @@ stages:
     code: 200 
 ```
 
-_gojet_ is a single binary, distributed in the [release page](https://github.com/asaf/gojet/releases)
+_gojet_ is a single binary, distributed under the [release page](https://github.com/asaf/gojet/releases)
 
 
 simply run a playbook by: `gojet playbook run --file <file>.yml` 
@@ -44,3 +44,6 @@ playing simplest playbook
 stage get a post
 [SUCCESS: 200 OK] status 
 ```
+
+
+For more info see [documentation](http://gojet.corilla.io/Documentation.html)
