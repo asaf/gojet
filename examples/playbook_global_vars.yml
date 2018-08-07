@@ -1,0 +1,8 @@
+name: "a playbook with use of global vars"
+stages:
+- name: "get a post"
+  request:
+    url: "{url}/posts/1"
+    method: GET
+  response:
+    code: 200

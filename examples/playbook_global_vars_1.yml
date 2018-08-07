@@ -1,0 +1,3 @@
+protocol: "http"
+host: "jsonplaceholder.typicode.com"
+url: "{protocol}://{host}"
