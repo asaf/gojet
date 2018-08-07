@@ -24,7 +24,11 @@ func RunPlaybook(pbook *model.Playbook, vars model.Vars) ([]*model.Assertions, e
 	c := http.DefaultClient
 
 	// enhance vars with local vars (where local may overrides global)
-	pbook.Vars.Resolve(true)
+	err := pbook.Vars.Resolve(true)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to resolve local vars")
+	}
+
 	for k, v := range pbook.Vars {
 		vars[k] = v
 	}
