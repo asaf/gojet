@@ -1,0 +1,8 @@
+name: "simplest playbook"
+stages:
+- name: "get a post 1"
+  request:
+    url: "https://jsonplaceholder.typicode.com/posts/1"
+    method: GET
+  response:
+    code: 200
