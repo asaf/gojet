@@ -199,7 +199,7 @@ func TestRunPlaybook_Save(t *testing.T) {
 	assert.Equal(t, "markdown", vars["b"])
 }
 
-//TestRunPlaybook is more of a complete scenario that tests multi stages with shared vars, placeholders, etc.
+//TestRunPlaybook is more of a complete scenario that tests multi stages with shared vars, placeholders, vars precedence, etc.
 func TestRunPlaybook(t *testing.T) {
 	hits := 0
 	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -214,11 +214,15 @@ func TestRunPlaybook(t *testing.T) {
 		}
 	}))
 
-	pbook := &model.Playbook{Name: "full pbook"}
+	pbook := &model.Playbook{
+		Name: "full pbook",
+		// local var should override global var
+		Vars: model.Vars{"host": s.URL},
+	}
 	pbook.Stages = append(pbook.Stages, &model.Stage{
 		Name: "create a post",
 		Request: &model.Request{
-			Url:    s.URL,
+			Url:    "{host}",
 			Method: model.POST,
 		},
 		Response: &model.Response{
@@ -237,7 +241,7 @@ func TestRunPlaybook(t *testing.T) {
 		},
 	})
 
-	_, err := RunPlaybook(pbook, model.Vars{})
+	_, err := RunPlaybook(pbook, model.Vars{"host": "localhost"})
 	assert.Nil(t, err)
 	assert.Equal(t, 2, hits)
 

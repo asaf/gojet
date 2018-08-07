@@ -16,6 +16,7 @@ const (
 // Playbook is a named stages composition
 type Playbook struct {
 	Name   string   `json:"name"`
+	Vars   Vars     `json:"vars"`
 	Stages []*Stage `json:"stages"`
 }
 

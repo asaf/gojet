@@ -23,6 +23,12 @@ func RunPlaybook(pbook *model.Playbook, vars model.Vars) ([]*model.Assertions, e
 	elapsed := time.Now()
 	c := http.DefaultClient
 
+	// enhance vars with local vars (where local may overrides global)
+	pbook.Vars.Resolve(true)
+	for k, v := range pbook.Vars {
+		vars[k] = v
+	}
+
 	var as []*model.Assertions
 	for _, st := range pbook.Stages {
 		log.WithFields(log.Fields{"name": st.Name}).Debug("executing stage started")
