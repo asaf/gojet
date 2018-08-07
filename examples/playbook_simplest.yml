@@ -1,6 +1,6 @@
 name: "simplest playbook"
 stages:
-- name: "get a post 1"
+- name: "get a post"
   request:
     url: "https://jsonplaceholder.typicode.com/posts/1"
     method: GET
