@@ -30,8 +30,11 @@ var playbookRunCmd = cli.Command{
 			return
 		}
 
-		if err := testRun(pbookFname, c.String("vars"), c.Bool("env-vars")); err != nil {
+		if code, err := testRun(pbookFname, c.String("vars"), c.Bool("env-vars")); err != nil {
 			fmt.Fprintf(os.Stderr, "%s\n", err)
+			os.Exit(2)
+		} else {
+			os.Exit(code)
 		}
 	},
 	Flags: []cli.Flag{
@@ -50,29 +53,34 @@ var playbookRunCmd = cli.Command{
 	},
 }
 
-func testRun(pbookFname, varsFname string, withEnvVars bool) error {
+func testRun(pbookFname, varsFname string, withEnvVars bool) (int, error) {
 	vars, err := loadVars(varsFname, withEnvVars)
 	if err != nil {
-		return err
+		return 2, err
 	}
 
 	pbook, err := loadPlaybook(pbookFname)
 	if err != nil {
-		return err
+		return 2, err
 	}
 
 	assertions, err := cmds.RunPlaybook(pbook, vars)
 	if err != nil {
-		return errors.Wrap(err, "failed to run manifest")
+		return 2, errors.Wrap(err, "failed to run manifest")
 	}
 
 	Cyan.Printf("playing %s\n", pbook.Name)
+	errors := 0
 	for _, as := range assertions {
 		MagentaHi.Printf("stage %s\n", as.Name)
-		printAssertions(as)
+		errors += printAssertions(as)
 	}
 
-	return nil
+	if errors > 0 {
+		return 1, nil
+	}
+
+	return 0, nil
 }
 
 func loadPlaybook(pbookFname string) (*model.Playbook, error) {
@@ -111,12 +119,16 @@ func loadVars(varsFname string, withEnvVars bool) (model.Vars, error) {
 	return vars, nil
 }
 
-func printAssertions(as *model.Assertions) {
+func printAssertions(as *model.Assertions) int {
+	errors := 0
 	for _, a := range as.Assertions {
 		if a.Actual != a.Expected {
 			Red.Printf("[FAILED: %s] %s - expected [%v] actual [%v]\n", a.Msg, a.Kind, a.Expected, a.Actual)
+			errors++
 		} else {
 			Green.Printf("[SUCCESS: %s] %s \n", a.Msg, a.Kind)
 		}
 	}
+
+	return errors
 }
