@@ -1,0 +1,13 @@
+name: "a playbook with local vars"
+vars:
+  host: "jsonplaceholder.typicode.com"
+  cicdtoken: "{AUTH_TOKEN}"
+stages:
+- name: "get a post"
+  request:
+    url: "https://{host}/posts/1"
+    method: GET
+    headers:
+      token: "{cicdtoken}"
+  response:
+    code: 200
