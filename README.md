@@ -5,28 +5,35 @@
 GoJet is a CLI tool to automate testing of HTTP APIs, written in Golang.
 
 While unit tests aims to test internal functions and written by developers,
-_acceptance / integration tests_ aims to test high level API and can be written by QA.
+_acceptance / integration tests_ aims to test high level API and can possible be written by automation / QA teams.
 
 GoJet can run as a part of _CICD_ pipeline as one would do with standard unit tests. 
 
-We struggled finding a descriptive approach to write _integration tests_ for our RESTful API, the result is GoJet.
+We struggled finding a descriptive approach to write _integration tests_ for our RESTful API that
+suites our native stack, the result is GoJet.
 
-
-# Playbook
+# Quickstart
 
 A playbook is a composition of stages where each stage represents an http test,
 
-here is a simple playbook with single stage that perform _GET_ http request to get a blog post:
+Here is a single stage playbook that performs an http _GET_ request for a blog post and asserts that the returned
+status code is _200_:
 
 ```yml
-name: "simplest playbook"
+name: "test blog REST API"
 stages:
-- name: "get a post"
+- name: "get a post 1"
   request:
     url: "https://jsonplaceholder.typicode.com/posts/1"
+    method: GET
+  response:
+    code: 200 
 ```
 
-to run a playbook simply run: `gojet playbook run --file <file>.yml` 
+_gojet_ is a single binary, distributed in the [release page](https://github.com/asaf/gojet/releases)
+
+
+simply run a playbook by: `gojet playbook run --file <file>.yml` 
 
 output example:
 
@@ -35,8 +42,3 @@ playing simplest playbook
 stage get a post
 [SUCCESS: 200 OK] status 
 ```
-
-explanation:
-
-- GET http request is submitted (as no custom _method_ was specified) to the specified url
-- Default status assertion expects status code to be _200 OK_
