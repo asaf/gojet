@@ -1,0 +1,95 @@
+name: "a playbook for testing RESTFul CRUD API"
+vars:
+  host: "localhost:9090"
+  api: "http://{host}/api"
+  postsApi: "{api}/posts"
+stages:
+- name: "reset app data"
+  request:
+    url: "{api}/.reset"
+    method: POST
+- name: "anonymous calls should be reject"
+  request:
+    url: "{postsApi}"
+  response:
+    code: 401
+- name: "authenticate"
+  request:
+    url: "{api}/.login"
+    method: POST
+    form:
+      username: "admin"
+      password: "secret"
+  response:
+    save:
+      body:
+        tok: "token"
+- name: "Create"
+  request:
+    url: "{postsApi}"
+    method: POST
+    headers:
+      token: "{tok}"
+    json:
+      title: "gojet"
+      content:
+        kind: "text"
+        body: "posted by gojet"
+  response:
+    code: 201
+    body:
+      "id": !exp id != nil
+    save:
+      body:
+        postId: "id"
+- name: "Get"
+  request:
+    url: "{postsApi}/{postId}"
+    headers:
+      token: "{tok}"
+  response:
+    body:
+      title: "gojet"
+      content.kind: "text"
+      content.body: "posted by gojet"
+- name: "List"
+  request:
+    url: "{postsApi}"
+    headers:
+      token: "{tok}"
+  response:
+    body:
+      # https://github.com/oliveagle/jsonpath/issues/20
+      # "[?(@.title == gojet)]": !exp len(val) == 1
+      "[2].title": "gojet"
+- name: "Update"
+  request:
+    url: "{postsApi}/{postId}"
+    method: PUT
+    json:
+      title: "gojet - 1"
+      content:
+        kind: "text"
+        body: "posted by gojet - 1"
+    headers:
+      token: "{tok}"
+  response:
+    body:
+      title: "gojet - 1"
+      content.kind: "text"
+      content.body: "posted by gojet - 1"
+- name: "Delete"
+  request:
+    url: "{postsApi}/{postId}"
+    method: DELETE
+    headers:
+      token: "{tok}"
+  response:
+    code: 204
+- name: "Should not find a deleted resource"
+  request:
+    url: "{postsApi}/{postId}"
+    headers:
+      token: "{tok}"
+  response:
+    code: 404
