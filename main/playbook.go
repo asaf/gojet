@@ -5,8 +5,9 @@ import (
 )
 
 var testCmds = cli.Command{
-	Name:  "playbook",
-	Usage: "Playbook Commands",
+	Aliases: []string{"p", "pbook"},
+	Name:    "playbook",
+	Usage:   "Playbook Commands",
 	Subcommands: []cli.Command{
 		playbookRunCmd,
 	},
