@@ -69,10 +69,10 @@ func testRun(pbookFname, varsFname string, withEnvVars bool) (int, error) {
 		return 2, errors.Wrap(err, "failed to run manifest")
 	}
 
-	Cyan.Printf("playing %s\n", pbook.Name)
+	Cyan.Printf("playbook :: playing %s\n", pbook.Name)
 	errors := 0
 	for _, as := range assertions {
-		MagentaHi.Printf("stage %s\n", as.Name)
+		MagentaHi.Printf("stage :: %s\n", as.Name)
 		errors += printAssertions(as)
 	}
 
@@ -126,7 +126,7 @@ func printAssertions(as *model.Assertions) int {
 			Red.Printf("[FAILED: %s] %s - expected [%v] actual [%v]\n", a.Msg, a.Kind, a.Expected, a.Actual)
 			errors++
 		} else {
-			Green.Printf("[SUCCESS: %s] %s \n", a.Msg, a.Kind)
+			Green.Printf("[%s] %s \n", a.Msg, a.Kind)
 		}
 	}
 
