@@ -17,5 +17,7 @@ func define(vm VM) error {
 		return err
 	}
 
+	err = vm.Define("is_uuid", isUUID)
+
 	return nil
 }
