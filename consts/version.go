@@ -4,7 +4,7 @@ import "fmt"
 
 const (
 	verMajor = 0
-	verMinor = 1
+	verMinor = 3
 	verPatch = 0
 )
 
