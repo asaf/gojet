@@ -24,6 +24,66 @@ func init() {
 	logrus.SetLevel(logrus.DebugLevel)
 }
 
+func TestFindPath(t *testing.T) {
+
+	arr := []map[string]interface{}{
+		{
+			"id": 1,
+			"foo": map[string]interface{}{
+				"bar": "baz",
+			},
+		},
+	}
+
+	for _, each := range []struct {
+		name string
+		obj  interface{}
+		path []string
+		exp  interface {
+		}
+	}{
+		{
+			name: "should resolve non nested key in object",
+			obj:  map[string]interface{}{"foo": "bar"},
+			path: []string{"foo", "$.foo"},
+			exp:  "bar",
+		},
+		{
+			name: "should resolve non nested key in object",
+			obj:  map[string]interface{}{"foo": map[string]interface{}{"bar": "baz"}},
+			path: []string{"foo.bar"},
+			exp:  "baz",
+		},
+		{
+			name: "should resolve nested entry in an array",
+			obj:  arr,
+			path: []string{
+				"[0].foo.bar",
+				// see: https://github.com/oliveagle/jsonpath/issues/20
+				// "$[?(@.id)]",
+			},
+			exp: "baz",
+		},
+		{
+			name: "should resolve nested obj -> array via exp",
+			obj: map[string][]map[string]interface{}{
+				"obj": arr,
+			},
+			path: []string{
+				"$.obj[?(@.id == 1)].foo.bar[0]",
+			},
+			exp: "baz",
+		},
+	} {
+		for _, p := range each.path {
+			msg := each.name + " :: " + p
+			res, err := findPath(each.obj, p)
+			assert.Nil(t, err, each.name, msg)
+			assert.Equal(t, each.exp, res, msg)
+		}
+	}
+}
+
 func TestCreateHttpRequestOfRequest(t *testing.T) {
 	st := &model.Stage{
 		Request: &model.Request{
@@ -44,12 +104,28 @@ func TestCreateHttpRequestOfRequest(t *testing.T) {
 	assert.Equal(t, "foo=bar", hreq.URL.Query().Get("filter"))
 	// assert header
 	//
-	assert.Len(t, hreq.Header, 1)
 	assert.Equal(t, "json", hreq.Header.Get("content"))
 	// assert json body
 	bodyBytes, err := ioutil.ReadAll(hreq.Body)
 	assert.Nil(t, err)
 	assert.Equal(t, `{"content":{"type":"markdown"},"id":1,"title":"hello"}`, string(bodyBytes))
+	assert.Equal(t, "application/json", hreq.Header.Get("Content-Type"))
+}
+
+func TestCreateHttpRequestOfRequest_Form(t *testing.T) {
+	st := &model.Stage{
+		Request: &model.Request{
+			Url:     "/foo",
+			Method:  http.MethodPost,
+			Form:    map[string]string{"user": "admin", "pass": "secret"},
+			Headers: map[string]string{"content": "json"},
+		},
+	}
+	hreq, err := createHttpRequestOfRequest(st)
+	assert.Nil(t, err)
+	assert.Equal(t, "application/x-www-form-urlencoded", hreq.Header.Get("Content-Type"))
+	assert.Equal(t, "admin", hreq.FormValue("user"))
+	assert.Equal(t, "secret", hreq.FormValue("pass"))
 }
 
 func TestResolveStagePlaceholders(t *testing.T) {

@@ -13,6 +13,7 @@ import (
 	"github.com/asaf/gojet/scripting"
 	"time"
 	"github.com/asaf/gojet/placeholders"
+	"net/url"
 )
 
 //RunPlaybook runs a playbook and yields an Assertions per stage
@@ -90,7 +91,7 @@ func RunPlaybook(pbook *model.Playbook, vars model.Vars) ([]*model.Assertions, e
 		// body (json) assertions
 		//
 		// expecting body to be a json
-		var jsonBody map[string]interface{}
+		var jsonBody interface{}
 		err = json.NewDecoder(httpResp.Body).Decode(&jsonBody)
 		if err != nil {
 			//a.AddOf(model.BodyAssertion, "json body", "non json body", err.Error())
@@ -160,39 +161,52 @@ func RunPlaybook(pbook *model.Playbook, vars model.Vars) ([]*model.Assertions, e
 func createHttpRequestOfRequest(stage *model.Stage) (*http.Request, error) {
 	req := stage.Request
 
-	body, err := json.Marshal(req.Json)
-	if err != nil {
-		return nil, errors.Wrap(err, "body cannot be a json")
+	var httpReq *http.Request
+	var err error
+	if req.Json != nil {
+		body, err := json.Marshal(req.Json)
+		if err != nil {
+			return nil, errors.Wrap(err, "body cannot be a json")
+		}
+		httpReq, err = http.NewRequest(string(stage.Request.Method), stage.Request.Url, bytes.NewBuffer(body))
+		httpReq.Header.Add("Content-Type", "application/json")
+	} else if req.Form != nil {
+		form := url.Values{}
+		for k, v := range req.Form {
+			form.Add(k, v)
+		}
+		httpReq, err = http.NewRequest(string(stage.Request.Method), stage.Request.Url, strings.NewReader(form.Encode()))
+		httpReq.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	} else {
+		httpReq, err = http.NewRequest(string(stage.Request.Method), stage.Request.Url, nil)
 	}
 
-	httpReq, err := http.NewRequest(string(stage.Request.Method), stage.Request.Url, bytes.NewBuffer(body))
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create http request")
 	}
+
 	q := httpReq.URL.Query()
 	for k, v := range req.Query {
 		q.Add(k, v)
 	}
 	httpReq.URL.RawQuery = q.Encode()
 
-	h := http.Header{}
 	for k, v := range req.Headers {
-		h.Add(k, v)
+		httpReq.Header.Add(k, v)
 	}
-
-	httpReq.Header = h
 
 	log.WithFields(log.Fields{"stage": stage.Name, "req-method": httpReq.Method, "req-header": httpReq.Header, "req-body": httpReq.Body, "req-url": httpReq.URL}).Debug("http request created")
 	return httpReq, err
 }
 
 // findPath finds the path in obj and yields the path evaluation result
-func findPath(obj map[string]interface{}, path string) (interface{}, error) {
+func findPath(obj interface{}, path string) (interface{}, error) {
 	if !strings.HasPrefix(path, "$.") {
 		path = "$." + path
 	}
 
 	result, err := jsonpath.JsonPathLookup(obj, path)
+	log.WithFields(log.Fields{"path": path, "value": result}).Debug("path evaluated")
 	if err != nil {
 		return nil, errors.Wrap(err, "unresolved path")
 	}
@@ -253,14 +267,19 @@ func resolveStagePlaceholders(st *model.Stage, vars model.Vars) error {
 	return nil
 }
 
-func createVMForStage(st *model.Stage, body map[string]interface{}) (scripting.VM, error) {
+func createVMForStage(st *model.Stage, body interface{}) (scripting.VM, error) {
 	vm, err := scripting.NewAnkoVM()
 	if err != nil {
 		return nil, err
 	}
 
-	for k, v := range body {
-		vm.Define(k, v)
+	switch b := body.(type) {
+	case map[string]interface{}:
+		for k, v := range b {
+			vm.Define(k, v)
+		}
+	case []map[string]interface{}:
+		fmt.Println("WHAT TO DO!?")
 	}
 
 	return vm, nil

@@ -32,6 +32,7 @@ type Request struct {
 	Url     string                 `json:"url"`
 	Method  httpMethod             `json:"method"`
 	Json    map[string]interface{} `json:"json"`
+	Form    map[string]string      `json:"form"`
 	Query   map[string]string      `json:"query"`
 	Headers map[string]string      `json:"headers"`
 }
