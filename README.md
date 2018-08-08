@@ -12,7 +12,7 @@ GoJet can run as a part of _CICD_ pipeline as one would do with standard unit te
 We struggled finding a descriptive approach to write _integration tests_ for our RESTful API that
 suites our native stack, the result is GoJet.
 
-![run_simplest_pbook.gif](https://media.corilla.com/gojet/demo.gif)
+![crud.gif](https://media.corilla.com/gojet/crud.gif)
 
 # Quickstart
 
